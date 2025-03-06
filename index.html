@@ -95,7 +95,7 @@
     <py-config>
         packages = []
         [[fetch]]
-        files = ["converter.py"]
+        files = ["py/converter.py"]
         
         [[runtimes]]
         src = "https://pyscript.net/releases/2025.2.4/core.js"
@@ -105,6 +105,8 @@
     
     <py-script>
         from js import document
+        import sys
+        sys.path.append("py")
         import converter
         
         def convert_text(text):
