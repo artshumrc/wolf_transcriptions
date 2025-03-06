@@ -1,0 +1,13 @@
+[project]
+name = "wolf-transcriptions"
+version = "0.1.0"
+description = "Convert Richard Wolf's transcriptions to WebVTT and provide validation."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pyodide-py==0.27.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

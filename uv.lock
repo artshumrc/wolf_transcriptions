@@ -1,0 +1,22 @@
+version = 1
+requires-python = ">=3.13"
+
+[[package]]
+name = "pyodide-py"
+version = "0.27.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6c/da/3e08ffdb73c4bbb7dd17aa60dad4c8a5c193fe587c879a1b26ea8be4d072/pyodide_py-0.27.3.tar.gz", hash = "sha256:5308a2784a0f709461bb215a8b60bebfbd6a28e713ee0121474f480137742c0b", size = 49998 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cc/72/519064954f7f6041101995f88221af68e623aceeb53b21ac7200972cdbdd/pyodide_py-0.27.3-py3-none-any.whl", hash = "sha256:9c43cd48be8100a4d3df9ebaca605f54f4a79c90fd3a2adca57c8ab17364ab79", size = 55843 },
+]
+
+[[package]]
+name = "wolf-transcriptions"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "pyodide-py" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "pyodide-py", specifier = "==0.27.3" }]
