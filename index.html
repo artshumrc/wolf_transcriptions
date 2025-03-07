@@ -18,8 +18,8 @@
             <textarea id="input-text" class="form-control w-100" 
                 placeholder="Paste your transcription text here..."
                 style="min-height: 200px;"></textarea>
-            <button id="convert-button" class="btn btn-primary my-1 w-100">Convert to WebVTT</button>
-            <button id="clear-button" class="btn btn-secondary w-100">Clear All</button>
+            <button id="convert-button" class="btn btn-primary my-1 w-100" onclick="convert()">Convert to WebVTT</button>
+            <button id="clear-button" class="btn btn-secondary w-100" onclick="clearOutput()">Clear All</button>
         </div>
         <div class="my-3">
             <div class="row gap-0">
@@ -29,7 +29,7 @@
                         class="form-control border-5"
                         style="min-height: 200px; font-family: monospace; white-space: nowrap; overflow-x: auto;"
                         spellcheck="false"></textarea>
-                    <button id="download-button" class="btn btn-primary mt-1 w-100">Download .vtt File</button>
+                    <button id="download-button" class="btn btn-primary mt-1 w-100" onclick="downloadWebVTT()">Download .vtt File</button>
                 </div>
                 <div class="col-auto" id="error-container" style="display: none;">
                     <h2 class="text-danger">Validation Errors</h3>

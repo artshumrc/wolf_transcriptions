@@ -1,9 +1,4 @@
-let isValidating = false;
-
 function validate() {
-  if (isValidating) return;
-  isValidating = true;
-
   const outputElement = document.getElementById("output");
   const resultElement = document.getElementById("result");
   const errorContainer = document.getElementById("error-container");
@@ -22,7 +17,7 @@ function validate() {
       outputElement.classList.remove("border-success");
       outputElement.classList.add("border-danger");
 
-      // Show and populate error list with error count
+      // Show and populate error list
       errorContainer.style.display = "block";
       errorList.innerHTML = "";
       const errorCount = tree.errors.length;
@@ -50,8 +45,6 @@ function validate() {
   } catch (error) {
     console.error("Validation error:", error);
     return false;
-  } finally {
-    isValidating = false;
   }
 }
 
@@ -72,76 +65,69 @@ function selectLine(lineNumber) {
   textarea.focus();
   textarea.setSelectionRange(startPos, endPos);
 
-  // Calculate scroll position
+  // calculate scroll position
   const lineHeight = textarea.scrollHeight / lines.length;
   const padding = 2; // Number of lines padding from top
   const targetScrollTop = Math.max(0, (lineNumber - padding) * lineHeight);
   
-  // Ensure we don't scroll past the bottom
+  // don't scroll past the bottom
   const maxScroll = textarea.scrollHeight - textarea.clientHeight;
   textarea.scrollTop = Math.min(targetScrollTop, maxScroll);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Convert button
-  document.getElementById("convert-button").addEventListener("click", () => {
-    const inputText = document.getElementById("input-text").value;
-    const outputElement = document.getElementById("output");
+function clearOutput() {
+  document.getElementById("input-text").value = "";
+  document.getElementById("output").value = "";
+  document.getElementById("error-container").style.display = "none";
+  document.getElementById("result").textContent = "";
+  const outputElement = document.getElementById("output");
+  outputElement.classList.remove("border-danger", "border-success");
+};
 
-    // Use the Python function through the window object
-    const webvttText = window.pyConvertToWebVtt(inputText);
-    outputElement.value = webvttText;
-    validate();
-  });
+function downloadWebVTT() {
+  const webvttText = document.getElementById("output").value;
 
-  // Download button
-  document.getElementById("download-button").addEventListener("click", () => {
-    const webvttText = document.getElementById("output").value;
+  if (!webvttText || webvttText === "Please paste some text to convert.") {
+    return;
+  }
 
-    if (!webvttText || webvttText === "Please paste some text to convert.") {
-      return;
-    }
+  let filename = prompt("Enter filename (will be saved as .vtt):", "transcript");
+  
+  // If user cancels prompt, abort download
+  if (filename === null) return;
+  
+  // Sanitize filename: remove extension if provided and invalid characters
+  filename = filename.replace(/\.[^/.]+$/, ""); // Strip any existing extension
+  filename = filename.replace(/[^a-zA-Z0-9-_]/g, "_"); // Replace invalid chars with underscore
+  
+  if (!filename) filename = "transcript";
+  
+  const blob = new Blob([webvttText], { type: "text/vtt" });
+  const url = URL.createObjectURL(blob);
 
-    let filename = prompt("Enter filename (will be saved as .vtt):", "transcript");
-    
-    // If user cancels prompt, abort download
-    if (filename === null) return;
-    
-    // Sanitize filename: remove extension if provided and invalid characters
-    filename = filename.replace(/\.[^/.]+$/, ""); // Remove any existing extension
-    filename = filename.replace(/[^a-zA-Z0-9-_]/g, "_"); // Replace invalid chars with underscore
-    
-    if (!filename) filename = "transcript"; // Fallback if filename is empty
-    
-    const blob = new Blob([webvttText], { type: "text/vtt" });
-    const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.vtt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${filename}.vtt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  });
-
-  // Clear button
-  document.getElementById("clear-button").addEventListener("click", () => {
-    document.getElementById("input-text").value = "";
-    document.getElementById("output").value = "";
-    document.getElementById("error-container").style.display = "none";
-    document.getElementById("result").textContent = "";
-    const outputElement = document.getElementById("output");
-    outputElement.classList.remove("border-danger", "border-success");
-  });
-
-  // Update output element references to use value instead of textContent
+function convert() {
+  const inputText = document.getElementById("input-text").value;
   const outputElement = document.getElementById("output");
 
-  // Add input event listener for validation
+  // Use the Python function
+  const webvttText = window.pyConvertToWebVtt(inputText);
+  outputElement.value = webvttText;
+  validate();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // validate on output on input so user can fix errors in real-time
+  const outputElement = document.getElementById("output");
   outputElement.addEventListener("input", () => {
-    if (!isValidating) {
-      setTimeout(validate, 100);
-    }
+    setTimeout(validate, 100);
   });
 });
