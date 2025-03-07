@@ -3,267 +3,44 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/favicon.png">
     <title>Wolf Transcriptions to WebVTT Converter</title>
-    <script type="module" src="https://pyscript.net/releases/2025.2.4/core.js"></script>
-    <link rel="stylesheet" href="https://pyscript.net/releases/2025.2.4/core.css">
+    <script type="module" src="/js/pyscript/core.js"></script>
+    <link rel="stylesheet" href="/css/pyscript.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
 </head>
-<body class="container">
+<body>
     <h1 class="fw-medium text-center">Wolf Transcriptions to WebVTT Converter</h1>
     
-    <div class="row">
-        <div class="col">
-            <h3 class="fw-medium">Instructions:</h3>
-            <ol class="list-group list-group-numbered list-group-flush">
-                <li class="list-group-item fw-normal">
-                    Paste your transcription text in the input area below
-                </li>
-                <li class="list-group-item fw-normal">
-                    Click the "Convert to WebVTT" button
-                </li>
-                <li class="list-group-item fw-normal">
-                    Copy the result or download as a .vtt file
-                </li>
-            </ol>
+    <div class="container-fluid mt-3">
+        <div>
+            <h2 class="text-center">Input</h2>
+            <textarea id="input-text" class="form-control w-100" 
+                placeholder="Paste your transcription text here..."
+                style="min-height: 200px;"></textarea>
+            <button id="convert-button" class="btn btn-primary my-1 w-100">Convert to WebVTT</button>
+            <button id="clear-button" class="btn btn-secondary w-100">Clear All</button>
+        </div>
+        <div class="my-3">
+            <div class="row gap-0">
+                <div class="col">
+                    <h2 class="text-center">Output (WebVTT) <span id="result" class="fw-bold"></span></h2>
+                    <textarea id="output" 
+                        class="form-control border-5"
+                        style="min-height: 200px; font-family: monospace; white-space: nowrap; overflow-x: auto;"
+                        spellcheck="false"></textarea>
+                    <button id="download-button" class="btn btn-primary mt-1 w-100">Download .vtt File</button>
+                </div>
+                <div class="col-auto" id="error-container" style="display: none;">
+                    <h2 class="text-danger">Validation Errors</h3>
+                    <ul class="list-group" id="error-list" style="max-height: 300px; overflow-y: auto;"></ul>
+                </div>
+            </div>
         </div>
     </div>
     
-    <div class="row">
-        <h2 class="text-center">Input</h2>
-        <textarea id="input-text" class="form-control w-100" 
-            placeholder="Paste your transcription text here..."
-            style="min-height: 400px;">
-        </textarea>
-        <button id="convert-button" class="btn btn-primary my-1 w-100">Convert to WebVTT</button>
-        <button id="clear-button" class="btn btn-secondary w-100">Clear All</button>
-    </div>
-    
-    <div class="row mt-2">
-        <h2 class="text-center">Output (WebVTT) <span id="result" class="fw-bold"></span></h2>
-        <div contenteditable id="output" 
-            style="white-space: pre-wrap; min-height: 400px;"
-            class="border border-5 p-2">
-        </div>
-        <button id="download-button" class="btn btn-primary mt-1 w-100">Download .vtt File</button>
-        </div>
-    
-    <div class="row mt-1 justify-content-center">
-        
-    </div>
-    
-    <py-config>
-        packages = []
-        [[fetch]]
-        files = ["py/converter.py"]
-        
-        [[runtimes]]
-        src = "https://pyscript.net/releases/2025.2.4/core.js"
-        name = "python"
-        lang = "python"
-    </py-config>
-    
-    <py-script>
-        from js import document
-        import sys
-        sys.path.append("py")
-        import converter
-        
-        def convert_text(text):
-            if not text.strip():
-                return "Please paste some text to convert."
-            
-            webvtt_lines = converter.wolf_to_webvtt(text)
-            return "\n".join(webvtt_lines)
-            
-        # Make the function available to JavaScript
-        import js
-        js.window.pyConvertToWebVtt = convert_text
-    </py-script>
-
+    <script type="py" config="/py/pyscript.toml" src="/py/main.py"></script>
     <script src="/js/parser.js"></script>
-    
-    <script>
-        // Flag to prevent recursive validation
-        let isValidating = false;
-        // Reference to the mutation observer
-        let observer;
-        
-        // Function to remove all highlights
-        function clearHighlights() {
-            const outputElement = document.getElementById('output');
-            const existingHighlights = outputElement.querySelectorAll('.highlighted-line');
-            existingHighlights.forEach(el => {
-                const textContent = el.textContent;
-                el.parentNode.replaceChild(document.createTextNode(textContent), el);
-            });
-        }
-        
-        function validate() {
-            // Prevent recursive validation
-            if (isValidating) return;
-            
-            isValidating = true;
-            
-            // Define variables at function scope so they're available in the finally block
-            const outputElement = document.getElementById('output');
-            const resultElement = document.getElementById('result');
-            
-            // Temporarily disconnect the observer
-            if (observer) observer.disconnect();
-            
-            try {
-                // Clear all highlights first
-                clearHighlights();
-                
-                const parser = new WebVTTParser();
-                const inputText = outputElement.textContent;
-                const tree = parser.parse(inputText, 'subtitles/captions/descriptions');
-                
-                if (tree.errors && tree.errors.length > 0) {
-                    console.log("Validation errors:", tree.errors);
-                    console.error('Invalid WebVTT format.');
-                    resultElement.textContent = 'Invalid';
-                    resultElement.classList.remove('text-success');
-                    resultElement.classList.add('text-danger');
-                    outputElement.classList.remove('border-success', 'text-success');
-                    outputElement.classList.add('border-danger');
-                    highlightLines(tree.errors);
-                    return false;
-                } else {
-                    console.log("No validation errors");
-                    console.log('Valid WebVTT format.');
-                    resultElement.textContent = 'Valid';
-                    resultElement.classList.remove('text-danger');
-                    resultElement.classList.add('text-success');
-                    outputElement.classList.remove('border-danger');
-                    outputElement.classList.add('border-success');
-                    return true;
-                }
-            } catch (error) {
-                console.error("Validation error:", error);
-                return false;
-            } finally {
-                // Reconnect the observer after DOM changes
-                if (observer) {
-                    observer.observe(outputElement, { 
-                        childList: true,
-                        characterData: true,
-                        subtree: true  // Also observe changes in child nodes
-                    });
-                }
-                
-                // Reset validation flag
-                isValidating = false;
-            }
-        }
-        
-        function highlightLines(errorObjects) {
-            if (!errorObjects || errorObjects.length === 0) {
-                // No errors to highlight, make sure all highlights are cleared
-                clearHighlights();
-                return;
-            }
-            
-            const outputElement = document.getElementById('output');
-            
-            // Get content and split into lines
-            const content = outputElement.textContent;
-            const lines = content.split('\n');
-            
-            // Clear current content
-            outputElement.textContent = '';
-            
-            // Rebuild content with highlights
-            lines.forEach((line, index) => {
-                // Find if this line has an error
-                const errorObj = errorObjects.find(err => err.line === index + 1);
-                
-                if (errorObj) {
-                    const span = document.createElement('span');
-                    span.className = 'highlighted-line';
-                    span.style.backgroundColor = 'yellow';
-                    span.style.display = 'block'; // Make it a block element to highlight the whole line
-                    span.title = errorObj.message; // Add error message as tooltip
-                    span.textContent = line;
-                    outputElement.appendChild(span);
-                } else {
-                    outputElement.appendChild(document.createTextNode(line));
-                }
-                
-                // Add line breaks except for the last line
-                if (index < lines.length - 1) {
-                    outputElement.appendChild(document.createTextNode('\n'));
-                }
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Convert button
-            document.getElementById('convert-button').addEventListener('click', () => {
-                const inputText = document.getElementById('input-text').value;
-                const outputElement = document.getElementById('output');
-                
-                // Use the Python function through the window object
-                const webvttText = window.pyConvertToWebVtt(inputText);
-                outputElement.textContent = webvttText;
-                validate();
-            });
-            
-            // Download button
-            document.getElementById('download-button').addEventListener('click', () => {
-                const webvttText = document.getElementById('output').textContent;
-                
-                if (!webvttText || webvttText === "Please paste some text to convert.") {
-                    return;
-                }
-                
-                const blob = new Blob([webvttText], {type: 'text/vtt'});
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'transcript.vtt';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            });
-            
-            // Clear button
-            document.getElementById('clear-button').addEventListener('click', () => {
-                document.getElementById('input-text').value = '';
-                document.getElementById('output').textContent = '';
-            });
-
-            // observe contenteditable div for changes
-            const outputElement = document.getElementById('output');
-            
-            // Create the observer and store the reference
-            observer = new MutationObserver(() => {
-                // Use setTimeout to delay validation and avoid rapid consecutive calls
-                if (!isValidating) {
-                    setTimeout(validate, 100);
-                }
-            });
-            
-            // Initial observation setup
-            observer.observe(outputElement, { 
-                childList: true,      // Watch for changes to child nodes
-                characterData: true,  // Watch for text content changes
-                subtree: true         // Watch for changes in child elements too
-            });
-            
-            // Additional listeners for paste and blur events
-            outputElement.addEventListener('paste', () => {
-                setTimeout(() => {
-                    if (!isValidating) validate();
-                }, 100); // Use timeout to let the paste operation complete
-            });
-            
-            outputElement.addEventListener('blur', () => {
-                if (!isValidating) validate();
-            });
-        });
-    </script>
+    <script src="/js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,5 @@
+packages = []
+[[fetch]]
+files = ["converter.py"]
+
+interpreter = "js/pyodide/pyodide.mjs"
