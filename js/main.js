@@ -89,7 +89,7 @@ function downloadWebVTT() {
   
   // Sanitize filename: remove extension if provided and invalid characters
   filename = filename.replace(/\.[^/.]+$/, ""); // Strip any existing extension
-  filename = filename.replace(/[^a-zA-Z0-9-_]/g, "_"); // Replace invalid chars with underscore
+  filename = filename.replace(/[^a-zA-Z0-9-]/g, "_"); // Replace invalid chars with underscore
   
   if (!filename) filename = "transcript";
   
@@ -108,16 +108,18 @@ function downloadWebVTT() {
 function convert() {
   const inputText = document.getElementById("input-text").value;
   const outputElement = document.getElementById("output");
+  const recordingLength = document.getElementById("recording-length").value;
+  const framerate = document.getElementById("framerate").value;
 
   // Use the Python function
-  const webvttText = window.pyConvertToWebVtt(inputText);
+  const webvttText = window.pyConvertToWebVtt(inputText, recordingLength, framerate);
   outputElement.value = webvttText;
   validate();
   document.getElementById("tab-group").show("output");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // validate on output on input so user can fix errors in real-time
+  // validate on input so user can fix errors in real-time
   const outputElement = document.getElementById("output");
   outputElement.addEventListener("input", () => {
     setTimeout(validate, 100);

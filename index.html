@@ -39,10 +39,30 @@
             <sl-tab slot="nav" panel="output">Output</sl-tab>
         
             <sl-tab-panel name="input">
+                <div class="row m-0 py-0 gap-2">
+                    <div class="col p-0">
+                        <textarea id="input-text" class="form-control w-100 h-screen" placeholder="Paste your transcription text here...""></textarea>
+                        <button id="convert-button" class="btn btn-primary w-100" onclick="convert()">Convert to
+                            WebVTT</button>
+                    </div>
+                    <div class="col-auto p-0" style="max-width: 20rem;">
+                        <form>
+                            <legend>Options</legend>
+                            <div>
+                                <label for="recording-length" class="form-label mt-2">Recording Length</label>
+                                <input type="text" class="form-control" id="recording-length" aria-describedby="length-help" placeholder="hh:mm:ss">
+                                <small id="length-help" class="form-text text-muted">For calculating the last timestamp</small>
+                            </div>
+                            <div>
+                                <label for="framerate" class="form-label mt-4">Framerate</label>
+                                <input type="number" class="form-control" id="framerate" aria-describedby="framerate-help" value="30">
+                                <small id="framerate-help" class="form-text text-muted">For converting to milliseconds</small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 <div>
-                    <textarea id="input-text" class="form-control w-100 h-screen" placeholder="Paste your transcription text here...""></textarea>
-                    <button id="convert-button" class="btn btn-primary w-100" onclick="convert()">Convert to
-                        WebVTT</button>
+                    
                 </div>
             </sl-tab-panel>
 
@@ -55,8 +75,8 @@
                         <button id="download-button" class="btn btn-primary w-100" onclick="downloadWebVTT()">Download .vtt File</button>
                     </div>
                     <div class="col-auto p-0" id="error-container" style="display: none;">
-                        <h2 class="text-danger">Validation Errors</h3>
-                            <ul class="list-group h-screen" id="error-list"; style="overflow-y: auto;"></ul>
+                        <h2 class="text-danger">Validation Errors</h2>
+                        <ul class="list-group h-screen" id="error-list"; style="overflow-y: auto;"></ul>
                     </div>
                 </div>
             </sl-tab-panel>
