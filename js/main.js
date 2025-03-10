@@ -2,6 +2,7 @@ function validate() {
   const outputElement = document.getElementById("output");
   const errorContainer = document.getElementById("error-container");
   const errorList = document.getElementById("error-list");
+  const errorCountLabel = document.getElementById("error-count");
 
   try {
     const parser = new WebVTTParser();
@@ -17,6 +18,7 @@ function validate() {
       errorContainer.style.display = "block";
       errorList.innerHTML = "";
       const errorCount = tree.errors.length;
+      errorCountLabel.textContent = `(${errorCount})`;
 
       tree.errors.forEach((error, index) => {
         const button = document.createElement("button");
