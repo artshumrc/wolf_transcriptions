@@ -1,6 +1,5 @@
 function validate() {
   const outputElement = document.getElementById("output");
-  const resultElement = document.getElementById("result");
   const errorContainer = document.getElementById("error-container");
   const errorList = document.getElementById("error-list");
 
@@ -11,9 +10,6 @@ function validate() {
 
     if (tree.errors && tree.errors.length > 0) {
       console.log("Validation errors:", tree.errors);
-      resultElement.textContent = "Invalid";
-      resultElement.classList.remove("text-success");
-      resultElement.classList.add("text-danger");
       outputElement.classList.remove("border-success");
       outputElement.classList.add("border-danger");
 
@@ -21,7 +17,6 @@ function validate() {
       errorContainer.style.display = "block";
       errorList.innerHTML = "";
       const errorCount = tree.errors.length;
-      errorContainer.querySelector("h2").textContent = `Validation Errors (${errorCount})`;
 
       tree.errors.forEach((error, index) => {
         const button = document.createElement("button");
@@ -34,9 +29,6 @@ function validate() {
       return false;
     } else {
       console.log("No validation errors");
-      resultElement.textContent = "Valid";
-      resultElement.classList.remove("text-danger");
-      resultElement.classList.add("text-success");
       outputElement.classList.remove("border-danger");
       outputElement.classList.add("border-success");
       errorContainer.style.display = "none";
@@ -79,7 +71,6 @@ function clearOutput() {
   document.getElementById("input-text").value = "";
   document.getElementById("output").value = "";
   document.getElementById("error-container").style.display = "none";
-  document.getElementById("result").textContent = "";
   const outputElement = document.getElementById("output");
   outputElement.classList.remove("border-danger", "border-success");
 };
@@ -122,6 +113,7 @@ function convert() {
   const webvttText = window.pyConvertToWebVtt(inputText);
   outputElement.value = webvttText;
   validate();
+  document.getElementById("tab-group").show("output");
 }
 
 document.addEventListener("DOMContentLoaded", () => {

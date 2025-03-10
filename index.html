@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,39 +9,64 @@
     <script type="module" src="/js/pyscript/core.js"></script>
     <link rel="stylesheet" href="/css/pyscript.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/themes/light.css" />
+    <script type="module"
+        src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/shoelace-autoloader.js"></script>
+    <style>
+        sl-tab-group::part(nav) {
+            display: flex;
+            justify-content: space-around;
+        }
+        sl-tab::part(base) {
+            font-size: 2rem;
+        }
+        sl-tab::part(base) {
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+        .h-screen {
+            height: calc(100vh - 15.5rem);
+        }
+    </style>
 </head>
+
 <body>
-    <h1 class="fw-medium text-center">Wolf Transcriptions to WebVTT Converter</h1>
-    
-    <div class="container-fluid mt-3">
-        <div>
-            <h2 class="text-center">Input</h2>
-            <textarea id="input-text" class="form-control w-100" 
-                placeholder="Paste your transcription text here..."
-                style="height: 200px;"></textarea>
-            <button id="convert-button" class="btn btn-primary my-1 w-100" onclick="convert()">Convert to WebVTT</button>
-            <button id="clear-button" class="btn btn-secondary w-100" onclick="clearOutput()">Clear All</button>
-        </div>
-        <div class="my-3">
-            <div class="row gap-0">
-                <div class="col">
-                    <h2 class="text-center">Output (WebVTT) <span id="result" class="fw-bold"></span></h2>
-                    <textarea id="output" 
-                        class="form-control border-5"
-                        style="height: 200px; font-family: monospace; white-space: nowrap; overflow-x: auto;"
-                        spellcheck="false"></textarea>
-                    <button id="download-button" class="btn btn-primary mt-1 w-100" onclick="downloadWebVTT()">Download .vtt File</button>
+    <h1 class="fw-medium text-center fs-3">Wolf Transcriptions to WebVTT Converter</h1>
+
+    <div class="px-1 mt-3">
+        <sl-tab-group id="tab-group">
+            <sl-tab slot="nav" panel="input">Input</sl-tab>
+            <sl-tab slot="nav" panel="output">Output</sl-tab>
+        
+            <sl-tab-panel name="input">
+                <div>
+                    <textarea id="input-text" class="form-control w-100 h-screen" placeholder="Paste your transcription text here...""></textarea>
+                    <button id="convert-button" class="btn btn-primary w-100" onclick="convert()">Convert to
+                        WebVTT</button>
                 </div>
-                <div class="col-auto" id="error-container" style="display: none;">
-                    <h2 class="text-danger">Validation Errors</h3>
-                    <ul class="list-group" id="error-list" style="min-height: 300px; overflow-y: auto;"></ul>
+            </sl-tab-panel>
+
+            <sl-tab-panel name="output">
+                <div class="row m-0 py-0 gap-2">
+                    <div class="col p-0">
+                        <textarea id="output" class="form-control h-screen"
+                            style="font-family: monospace; white-space: nowrap; overflow-x: auto;"
+                            spellcheck="false"></textarea>
+                        <button id="download-button" class="btn btn-primary w-100" onclick="downloadWebVTT()">Download .vtt File</button>
+                    </div>
+                    <div class="col-auto p-0" id="error-container" style="display: none;">
+                        <h2 class="text-danger">Validation Errors</h3>
+                            <ul class="list-group h-screen" id="error-list"; style="overflow-y: auto;"></ul>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </sl-tab-panel>
+        </sl-tab-group>
+        <button id="clear-button" class="btn btn-outline-warning w-100 mt-0" onclick="clearOutput()">Clear All</button>
     </div>
-    
+
     <script type="py" config="/py/pyscript.toml" src="/py/main.py"></script>
     <script src="/js/parser.js"></script>
     <script src="/js/main.js"></script>
 </body>
+
 </html>
