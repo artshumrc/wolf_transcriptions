@@ -27,3 +27,7 @@ def convert_text(text: str, recording_length: str, framerate: str) -> str:
     
 # Make the function available to JavaScript
 js.window.pyConvertToWebVtt = convert_text
+
+# remove loading div
+js.document.getElementById("loading-div").style.display = "none"
+js.document.getElementById("main").style.display = "block"
